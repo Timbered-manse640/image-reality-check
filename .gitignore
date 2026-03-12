@@ -1,0 +1,5 @@
+node_modules/
+package*.json
+gen-icons.js
+.DS_Store
+*.zip

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px; padding: 24px;
+      background: #fff; color: #222;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 300;
+    }
+    h1 { font-size: 15px; color: #222; margin-bottom: 14px; font-weight: 400; letter-spacing: 0.5px; }
+    h1 span { font-size: 11px; color: #999; font-weight: 300; }
+    .info { font-size: 13px; color: #666; line-height: 1.7; }
+    .step {
+      margin-bottom: 6px; padding: 10px 14px;
+      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px;
+      font-size: 13px; color: #444; font-weight: 300;
+    }
+    .step em { color: #222; font-style: normal; font-weight: 400; }
+    .section-label {
+      font-size: 10px; color: #999; text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 8px; margin-top: 4px;
+    }
+    .features {
+      margin-top: 18px; padding: 14px;
+      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px;
+    }
+    .features .items {
+      font-size: 12px; color: #666; line-height: 2;
+    }
+    .tag {
+      display: inline-block; padding: 1px 6px;
+      border: 1px solid #ccc; border-radius: 3px;
+      font-size: 10px; color: #999; margin-left: 4px;
+      font-weight: 300;
+    }
+    .settings {
+      margin-top: 18px; padding: 14px;
+      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px;
+    }
+    .toggle-row {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .toggle-label { font-size: 13px; color: #444; font-weight: 300; }
+    .toggle-desc { font-size: 11px; color: #999; margin-top: 6px; font-weight: 300; }
+    .switch {
+      position: relative; width: 36px; height: 20px; flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background: #ccc; border-radius: 20px; transition: 0.3s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 14px; width: 14px;
+      left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s;
+    }
+    .switch input:checked + .slider { background: #222; }
+    .switch input:checked + .slider:before { transform: translateX(16px); }
+  </style>
+</head>
+<body>
+  <h1>图片打假 <span>v2.2.0</span></h1>
+  <div class="info" style="margin-bottom:18px;">
+    在任意网页图片上右键，选择「图片打假」即可开始分析。
+  </div>
+  <div class="step"><em>1.</em> 右键点击网页上的任意图片</div>
+  <div class="step"><em>2.</em> 选择「图片打假」</div>
+  <div class="step"><em>3.</em> 查看分析结果面板</div>
+  <div class="settings">
+    <div class="section-label" style="margin-top:0;">设置</div>
+    <div class="toggle-row">
+      <span class="toggle-label">自动检测</span>
+      <label class="switch">
+        <input type="checkbox" id="autoDetectToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="toggle-desc">开启后自动扫描页面图片并标注结果</div>
+  </div>
+
+  <div class="features">
+    <div class="section-label">分析项目</div>
+    <div class="items">
+      ELA热力图 · 纹理自然度 · 噪点一致性<br>
+      皮肤平滑度 · 人脸区域检测 <span class="tag">NEW</span><br>
+      AI生成概率 <span class="tag">NEW</span> · 频谱分析 <span class="tag">NEW</span><br>
+      TensorFlow.js 人脸检测 <span class="tag">NEW</span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

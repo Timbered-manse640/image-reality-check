@@ -1,0 +1,12 @@
+/* Styles for Image Reality Check extension */
+/* Main styles are inline in content.js for shadow DOM isolation */
+/* This file provides additional utility styles if needed */
+
+:root {
+  --rc-bg: #ffffff;
+  --rc-card: #f5f5f5;
+  --rc-accent: #222222;
+  --rc-text: #222222;
+  --rc-muted: #999999;
+  --rc-border: #e0e0e0;
+}

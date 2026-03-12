@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "图片打假",
+  "version": "2.2.0",
+  "description": "右键一键打假：ELA热力图、皮肤平滑度、AI生成概率、频谱分析、人脸检测",
+  "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "图片打假"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "lib/tf.min.js",
+        "lib/blazeface.min.js",
+        "lib/blazeface-model/model.json",
+        "lib/blazeface-model/group1-shard1of1.bin"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
