@@ -526,6 +526,77 @@ function analyzeSymmetry(canvas, ctx, faces) {
   return { symmetryScore, symmetryValue: avgSymmetry };
 }
 
+// ===== Screenshot Detection =====
+function detectScreenshot(canvas, ctx) {
+  const w = canvas.width, h = canvas.height;
+  const data = ctx.getImageData(0, 0, w, h).data;
+  const totalPixels = w * h;
+
+  // 1. Flat color block ratio: sample blocks, check if pixels are near-identical
+  const blockSize = 16;
+  const blocksX = Math.ceil(w / blockSize);
+  const blocksY = Math.ceil(h / blockSize);
+  let flatBlocks = 0, totalBlocks = 0;
+
+  for (let by = 0; by < blocksY; by++) {
+    for (let bx = 0; bx < blocksX; bx++) {
+      let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
+      for (let y = by * blockSize; y < Math.min((by + 1) * blockSize, h); y++) {
+        for (let x = bx * blockSize; x < Math.min((bx + 1) * blockSize, w); x++) {
+          const i = (y * w + x) * 4;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          if (r < minR) minR = r; if (r > maxR) maxR = r;
+          if (g < minG) minG = g; if (g > maxG) maxG = g;
+          if (b < minB) minB = b; if (b > maxB) maxB = b;
+        }
+      }
+      totalBlocks++;
+      // A flat block has very low color range (< 5 per channel)
+      if ((maxR - minR) < 5 && (maxG - minG) < 5 && (maxB - minB) < 5) flatBlocks++;
+    }
+  }
+  const flatRatio = flatBlocks / totalBlocks;
+
+  // 2. Unique color count in sample: screenshots use limited palette
+  const colorSet = new Set();
+  const sampleStep = Math.max(1, Math.floor(totalPixels / 10000));
+  for (let i = 0; i < data.length; i += sampleStep * 4) {
+    // Quantize to reduce near-duplicates
+    const r = data[i] >> 2, g = data[i + 1] >> 2, b = data[i + 2] >> 2;
+    colorSet.add((r << 16) | (g << 8) | b);
+  }
+  const uniqueColors = colorSet.size;
+  const lowColorDiversity = uniqueColors < 500;
+
+  // 3. Noise level: screenshots have near-zero high-frequency noise
+  let noiseSum = 0, noiseCount = 0;
+  for (let y = 1; y < h - 1; y += 3) {
+    for (let x = 1; x < w - 1; x += 3) {
+      const idx = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const center = data[idx + c];
+        const avg = (data[idx - 4 + c] + data[idx + 4 + c] +
+          data[((y - 1) * w + x) * 4 + c] + data[((y + 1) * w + x) * 4 + c]) / 4;
+        noiseSum += Math.abs(center - avg);
+        noiseCount++;
+      }
+    }
+  }
+  const avgNoise = noiseSum / noiseCount;
+  const veryLowNoise = avgNoise < 1.5;
+
+  // Decision: screenshot if 2+ indicators positive
+  let indicators = 0;
+  if (flatRatio > 0.35) indicators++;
+  if (lowColorDiversity) indicators++;
+  if (veryLowNoise) indicators++;
+  if (flatRatio > 0.5) indicators++; // strong signal
+
+  const isScreenshot = indicators >= 2;
+
+  return { isScreenshot, flatRatio, uniqueColors, avgNoise, indicators };
+}
+
 function analyzeEdgeCoherence(canvas, ctx) {
   const w = canvas.width, h = canvas.height;
   const data = ctx.getImageData(0, 0, w, h).data;
@@ -971,11 +1042,16 @@ async function analyzeImage(imageUrl, panel) {
       edgeResult.edgeScore * 0.15
     );
 
+    // Screenshot detection
+    const ssResult = detectScreenshot(origCanvas, origCtx);
+
     // Calculate overall scores
     const scores = calculateScore(elaResult, skinResult, aiProbability);
 
-    // ===== Stamp original image on the page if AI-generated or heavily modified =====
-    stampOriginalImage(imageUrl, scores.overall, aiProbability, skinResult);
+    // Don't stamp screenshots
+    if (!ssResult.isScreenshot) {
+      stampOriginalImage(imageUrl, scores.overall, aiProbability, skinResult);
+    }
 
     // ===== Render Results =====
     const loading = panel.querySelector('#rc-loading');
@@ -986,19 +1062,27 @@ async function analyzeImage(imageUrl, panel) {
     // Overall score
     const scoreEl = panel.querySelector('#rc-score');
     const scoreLabelEl = panel.querySelector('#rc-score-label');
-    scoreEl.textContent = scores.overall;
-    if (scores.overall >= 75) {
-      scoreEl.style.color = '#222';
-      scoreLabelEl.textContent = '真实';
-      scoreLabelEl.style.color = '#666';
-    } else if (scores.overall >= 40) {
-      scoreEl.style.color = '#222';
-      scoreLabelEl.textContent = '可疑';
-      scoreLabelEl.style.color = '#666';
+
+    if (ssResult.isScreenshot) {
+      scoreEl.textContent = '—';
+      scoreEl.style.color = '#999';
+      scoreLabelEl.textContent = '截图（非拍摄照片，评分不适用）';
+      scoreLabelEl.style.color = '#999';
     } else {
-      scoreEl.style.color = '#222';
-      scoreLabelEl.textContent = '虚假';
-      scoreLabelEl.style.color = '#666';
+      scoreEl.textContent = scores.overall;
+      if (scores.overall >= 75) {
+        scoreEl.style.color = '#222';
+        scoreLabelEl.textContent = '真实';
+        scoreLabelEl.style.color = '#666';
+      } else if (scores.overall >= 40) {
+        scoreEl.style.color = '#222';
+        scoreLabelEl.textContent = '可疑';
+        scoreLabelEl.style.color = '#666';
+      } else {
+        scoreEl.style.color = '#222';
+        scoreLabelEl.textContent = '虚假';
+        scoreLabelEl.style.color = '#666';
+      }
     }
 
     // ELA details (high = good → green)
@@ -1427,6 +1511,14 @@ async function autoAnalyzeImage(imgEl) {
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
+
+    updateProgress(progressFill, 10);
+    // Screenshot detection: skip screenshots entirely
+    const ssResult = detectScreenshot(canvas, ctx);
+    if (ssResult.isScreenshot) {
+      removeProgressBar(imgEl);
+      return;
+    }
 
     updateProgress(progressFill, 15);
     // Quick face check first when faceOnly mode is on
