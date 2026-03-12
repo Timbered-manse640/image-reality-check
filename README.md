@@ -1,86 +1,88 @@
-<![CDATA[# 🔍 图片打假 (Image Reality Check)
+# 图片打假 Image Reality Check
 
-<p align="center">
-  <img src="icon128.png" alt="图片打假 Logo" width="128" height="128">
-</p>
+![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
+![Manifest V3](https://img.shields.io/badge/manifest-v3-green.svg)
+![License](https://img.shields.io/badge/license-MIT-orange.svg)
+![Privacy](https://img.shields.io/badge/privacy-100%25%20offline-brightgreen.svg)
 
-<p align="center">
-  <strong>Chrome extension that automatically detects AI-generated images, beauty filters, and photo manipulation</strong><br>
-  <strong>自动检测 AI 生成图片、美颜滤镜和图片篡改的 Chrome 扩展</strong>
-</p>
+**Chrome extension that automatically detects AI-generated images, beauty filters, and photo manipulation — all offline, all client-side.**
 
-<p align="center">
-  <img src="https://img.shields.io/badge/version-2.2.0-blue.svg" alt="Version">
-  <img src="https://img.shields.io/badge/manifest-v3-green.svg" alt="Manifest V3">
-  <img src="https://img.shields.io/badge/license-MIT-orange.svg" alt="License">
-  <img src="https://img.shields.io/badge/privacy-100%25%20offline-brightgreen.svg" alt="Privacy">
-</p>
+**自动检测 AI 生成图片、美颜滤镜和图片篡改的 Chrome 扩展，完全离线，完全本地。**
 
 ---
 
-## ✨ Features / 功能
+## Features 功能
 
-- 🤖 **AI-Generated Image Detection** — Analyzes 6 dimensions to estimate probability of AI generation
-- 🔬 **Error Level Analysis (ELA)** — Colored heatmap revealing tampered or edited regions
-- 👤 **Face Detection** — BlazeFace-powered face counting and skin smoothness analysis
-- 🧴 **Beauty Filter Detection** — Measures skin texture uniformity to detect smoothing filters
-- 📊 **Frequency Spectrum Analysis** — DCT-based analysis detecting compression artifacts and cloning
-- 🔄 **Auto-Detection** — Automatically scans images on any webpage with progress indicator
-- ⚙️ **Settings Toggle** — Enable/disable auto-detection per your preference
-- 🖱️ **Right-Click Analysis** — Analyze any image via context menu
+- **AI 生成图片检测** — 6 维度分析（频谱、噪点、色彩、纹理、对称性、边缘），估算 AI 生成概率
+- **ELA 误差分析** — 彩色热力图揭示篡改和编辑区域
+- **人脸检测** — BlazeFace 驱动的人脸识别 + 皮肤平滑度分析
+- **美颜滤镜检测** — 通过皮肤纹理方差检测磨皮滤镜
+- **自动检测** — 打开任何网页自动扫描图片，带进度条指示
+- **结果盖章** — 检测到问题图片直接在原图上盖章标记
+- **设置开关** — 可随时开关自动检测
+- **右键分析** — 右键任意图片手动深度分析
 
-## 🔐 Privacy / 隐私
+## Privacy 隐私
 
-**All processing happens locally in your browser.** No images are uploaded. No data is sent to any server. Zero network requests. Your images never leave your device.
+**所有分析均在浏览器本地完成。** 不上传图片，不发送任何数据，零网络请求。你的图片永远不会离开你的设备。
 
-**所有分析均在浏览器本地完成。** 不上传图片，不发送任何数据，零网络请求。
+**All processing happens locally in your browser.** No images are uploaded. No data is sent to any server. Zero network requests.
 
-## 📸 Screenshots / 截图
+## Installation 安装
 
-> *Coming soon*
+### 开发者模式加载
 
-## 📦 Installation / 安装
-
-### Load Unpacked (Developer Mode)
-
-1. Download or clone this repository
-2. Open `chrome://extensions/` in Chrome
-3. Enable **Developer mode** (top right)
-4. Click **Load unpacked** and select this directory
+1. 下载或 clone 本仓库
+2. Chrome 打开 `chrome://extensions/`
+3. 开启右上角 **开发者模式**
+4. 点击 **加载已解压的扩展程序**，选择本目录
 
 ### Chrome Web Store
 
-> *Coming soon*
+> Coming soon
 
-## 🔧 How It Works / 原理
+## How It Works 原理
 
-| Method | Description |
-|--------|-------------|
-| **ELA (Error Level Analysis)** | Re-compresses the image at a known quality level and compares the difference. Edited regions show higher error levels, visualized as a colored heatmap. |
-| **Skin Smoothness** | Detects faces using BlazeFace, then analyzes skin texture variance in detected face regions. Unnaturally low variance indicates beauty filter usage. |
-| **AI Generation Detection** | Scores images across 6 dimensions: color distribution uniformity, frequency domain artifacts, texture repetition patterns, edge consistency, noise distribution, and symmetry analysis. |
-| **Frequency Spectrum** | Applies DCT (Discrete Cosine Transform) to detect periodic patterns, compression artifacts, and copy-paste manipulation traces. |
-| **Auto-Detection** | Content script monitors page images, runs lightweight analysis automatically, and displays a floating indicator with results. |
+### ELA 误差级别分析
 
-## 🛠 Tech Stack / 技术栈
+以已知质量重新压缩图片并对比差异。被编辑过的区域会显示更高的误差级别，以彩色热力图呈现。
 
-- **Manifest V3** — Modern Chrome extension architecture
-- **TensorFlow.js** — Client-side ML inference
-- **BlazeFace** — Real-time face detection model
-- **Canvas API** — Image pixel manipulation and analysis
-- **Pure JavaScript** — No build step, no frameworks
+### 皮肤平滑度检测
 
-## 🤝 Contributing / 贡献
+使用 BlazeFace 检测人脸，分析面部皮肤区域（额头、脸颊、下巴）的纹理方差。方差异常低 = 美颜滤镜。
 
-Contributions are welcome! Feel free to:
+### AI 生成检测
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+从 6 个维度评估图片：
+- **频谱分析** — AI 图片高频成分衰减更陡
+- **噪点均匀度** — AI 图片噪声分布异常均匀
+- **色彩分布** — AI 图片直方图更平滑
+- **纹理规律性** — AI 图片 LBP 纹理更规则
+- **面部对称性** — AI 生成的脸更对称
+- **边缘一致性** — 检测 AI 典型的边缘伪影
 
-## 📄 License / 许可
+### 自动检测
+
+Content Script 监控页面图片加载，自动运行轻量分析，在图片上显示进度条和结果标记。
+
+## Tech Stack 技术栈
+
+- **Manifest V3** — Chrome 扩展架构
+- **TensorFlow.js** — 浏览器端 ML 推理
+- **BlazeFace** — 实时人脸检测模型
+- **Canvas API** — 图像像素操作与分析
+- **Pure JavaScript** — 无构建步骤，无框架依赖
+
+## Contributing 贡献
+
+欢迎贡献！
+
+1. Fork 本仓库
+2. 创建功能分支 `git checkout -b feature/amazing-feature`
+3. 提交更改 `git commit -m 'Add amazing feature'`
+4. 推送分支 `git push origin feature/amazing-feature`
+5. 发起 Pull Request
+
+## License 许可
 
 [MIT License](LICENSE) © 2026
-]]>
