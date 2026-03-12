@@ -1263,26 +1263,33 @@ function makeBar(label, value, desc) {
 
 // ===== Auto-Detection System =====
 let autoDetectEnabled = false;
+let faceOnlyMode = true;
 let autoScanObserver = null;
 let autoScanQueue = [];
 let autoScanProcessing = 0;
 const AUTO_SCAN_CONCURRENCY = 2;
 const MIN_IMG_SIZE = 100;
 
-// Initialize auto-detect from storage
-chrome.storage.sync.get({ autoDetect: true }, (data) => {
+// Initialize settings from storage
+chrome.storage.sync.get({ autoDetect: true, faceOnly: true }, (data) => {
   autoDetectEnabled = data.autoDetect;
+  faceOnlyMode = data.faceOnly;
   if (autoDetectEnabled) startAutoScan();
 });
 
 // Listen for toggle changes in real-time
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && changes.autoDetect) {
-    autoDetectEnabled = changes.autoDetect.newValue;
-    if (autoDetectEnabled) {
-      startAutoScan();
-    } else {
-      stopAutoScan();
+  if (area === 'sync') {
+    if (changes.autoDetect) {
+      autoDetectEnabled = changes.autoDetect.newValue;
+      if (autoDetectEnabled) {
+        startAutoScan();
+      } else {
+        stopAutoScan();
+      }
+    }
+    if (changes.faceOnly) {
+      faceOnlyMode = changes.faceOnly.newValue;
     }
   }
 });
@@ -1295,6 +1302,8 @@ chrome.runtime.onMessage.addListener((message) => {
   } else if (message.type === 'RC_STOP_AUTO_SCAN') {
     autoDetectEnabled = false;
     stopAutoScan();
+  } else if (message.type === 'RC_UPDATE_FACE_ONLY') {
+    faceOnlyMode = message.faceOnly;
   }
 });
 
@@ -1420,9 +1429,14 @@ async function autoAnalyzeImage(imgEl) {
     ctx.drawImage(img, 0, 0);
 
     updateProgress(progressFill, 15);
-    const elaResult = await performELA(canvas, ctx, img);
-    updateProgress(progressFill, 30);
+    // Quick face check first when faceOnly mode is on
     const faces = detectFacesHeuristic(canvas, ctx);
+    if (faceOnlyMode && faces.length === 0) {
+      removeProgressBar(imgEl);
+      return;
+    }
+    updateProgress(progressFill, 20);
+    const elaResult = await performELA(canvas, ctx, img);
     updateProgress(progressFill, 40);
     const skinResult = analyzeSkinWithFaces(canvas, ctx, faces);
     updateProgress(progressFill, 50);
