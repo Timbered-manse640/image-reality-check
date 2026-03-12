@@ -1,4 +1,4 @@
-# 图片打假 Image Reality Check
+# Image Reality Check
 
 ![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
 ![Manifest V3](https://img.shields.io/badge/manifest-v3-green.svg)
@@ -7,82 +7,82 @@
 
 **Chrome extension that automatically detects AI-generated images, beauty filters, and photo manipulation — all offline, all client-side.**
 
-**自动检测 AI 生成图片、美颜滤镜和图片篡改的 Chrome 扩展，完全离线，完全本地。**
+[🇨🇳 中文文档](README_CN.md)
 
 ---
 
-## Features 功能
+## Features
 
-- **AI 生成图片检测** — 6 维度分析（频谱、噪点、色彩、纹理、对称性、边缘），估算 AI 生成概率
-- **ELA 误差分析** — 彩色热力图揭示篡改和编辑区域
-- **人脸检测** — BlazeFace 驱动的人脸识别 + 皮肤平滑度分析
-- **美颜滤镜检测** — 通过皮肤纹理方差检测磨皮滤镜
-- **自动检测** — 打开任何网页自动扫描图片，带进度条指示
-- **结果盖章** — 检测到问题图片直接在原图上盖章标记
-- **设置开关** — 可随时开关自动检测
-- **右键分析** — 右键任意图片手动深度分析
+- **AI-Generated Image Detection** — 6-dimension analysis (frequency spectrum, noise, color, texture, symmetry, edges)
+- **Error Level Analysis (ELA)** — Colored heatmap revealing tampered or edited regions
+- **Face Detection** — BlazeFace-powered face detection + skin smoothness analysis
+- **Beauty Filter Detection** — Detects skin smoothing filters via texture variance
+- **Screenshot Detection** — Automatically skips screenshots and non-photo images
+- **Auto-Detection** — Scans all images on any webpage with progress indicator
+- **Stamp Results** — Marks suspicious images directly on the page (AI / Beauty Filter / Edited)
+- **Face-Only Mode** — Only analyze images containing faces (default ON)
+- **Right-Click Analysis** — Deep analysis of any image via context menu
+- **Settings Toggle** — Enable/disable auto-detection and face-only mode
 
-## Privacy 隐私
+## Privacy
 
-**所有分析均在浏览器本地完成。** 不上传图片，不发送任何数据，零网络请求。你的图片永远不会离开你的设备。
+**All processing happens locally in your browser.** No images are uploaded. No data is sent to any server. Zero network requests. Your images never leave your device.
 
-**All processing happens locally in your browser.** No images are uploaded. No data is sent to any server. Zero network requests.
+## Installation
 
-## Installation 安装
+### Developer Mode
 
-### 开发者模式加载
-
-1. 下载或 clone 本仓库
-2. Chrome 打开 `chrome://extensions/`
-3. 开启右上角 **开发者模式**
-4. 点击 **加载已解压的扩展程序**，选择本目录
+1. Download the [latest release](https://github.com/xbanboo/image-reality-check/releases/latest) and unzip
+2. Open `chrome://extensions/` in Chrome
+3. Enable **Developer mode** (top right)
+4. Click **Load unpacked** and select the unzipped directory
 
 ### Chrome Web Store
 
 > Coming soon
 
-## How It Works 原理
+## How It Works
 
-### ELA 误差级别分析
+### ELA (Error Level Analysis)
 
-以已知质量重新压缩图片并对比差异。被编辑过的区域会显示更高的误差级别，以彩色热力图呈现。
+Re-compresses the image at a known quality level and compares the difference. Edited regions show higher error levels, visualized as a colored heatmap.
 
-### 皮肤平滑度检测
+### Skin Smoothness Detection
 
-使用 BlazeFace 检测人脸，分析面部皮肤区域（额头、脸颊、下巴）的纹理方差。方差异常低 = 美颜滤镜。
+Uses BlazeFace to detect faces, then analyzes skin texture variance in face regions (forehead, cheeks, chin). Unnaturally low variance indicates beauty filter usage.
 
-### AI 生成检测
+### AI Generation Detection
 
-从 6 个维度评估图片：
-- **频谱分析** — AI 图片高频成分衰减更陡
-- **噪点均匀度** — AI 图片噪声分布异常均匀
-- **色彩分布** — AI 图片直方图更平滑
-- **纹理规律性** — AI 图片 LBP 纹理更规则
-- **面部对称性** — AI 生成的脸更对称
-- **边缘一致性** — 检测 AI 典型的边缘伪影
+Scores images across 6 dimensions:
+- **Frequency Spectrum** — AI images have steeper high-frequency falloff
+- **Noise Uniformity** — AI images have unnaturally uniform noise distribution
+- **Color Distribution** — AI images have smoother color histograms
+- **Texture Regularity** — AI images have more regular LBP texture patterns
+- **Facial Symmetry** — AI-generated faces tend to be more symmetrical
+- **Edge Coherence** — Detects AI-typical edge artifacts
 
-### 自动检测
+### Screenshot Detection
 
-Content Script 监控页面图片加载，自动运行轻量分析，在图片上显示进度条和结果标记。
+Identifies screenshots via flat color block ratio, color diversity, and noise level. Screenshots are automatically skipped in auto-detection mode.
 
-## Tech Stack 技术栈
+## Tech Stack
 
-- **Manifest V3** — Chrome 扩展架构
-- **TensorFlow.js** — 浏览器端 ML 推理
-- **BlazeFace** — 实时人脸检测模型
-- **Canvas API** — 图像像素操作与分析
-- **Pure JavaScript** — 无构建步骤，无框架依赖
+- **Manifest V3** — Modern Chrome extension architecture
+- **TensorFlow.js** — Client-side ML inference
+- **BlazeFace** — Real-time face detection model
+- **Canvas API** — Image pixel manipulation and analysis
+- **Pure JavaScript** — No build step, no frameworks
 
-## Contributing 贡献
+## Contributing
 
-欢迎贡献！
+Contributions are welcome!
 
-1. Fork 本仓库
-2. 创建功能分支 `git checkout -b feature/amazing-feature`
-3. 提交更改 `git commit -m 'Add amazing feature'`
-4. 推送分支 `git push origin feature/amazing-feature`
-5. 发起 Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License 许可
+## License
 
 [MIT License](LICENSE) © 2026
